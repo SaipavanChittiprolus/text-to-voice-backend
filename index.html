@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎤 Vibrant Text to Voice Converter</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 500px;
+      min-height: 120px;
+      border-radius: 12px;
+      border: none;
+      padding: 1rem;
+      font-size: 1.1rem;
+      resize: vertical;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      transition: box-shadow 0.3s ease;
+    }
+    textarea:focus {
+      outline: none;
+      box-shadow: 0 6px 25px #ff9a9e;
+    }
+
+    label {
+      display: block;
+      margin-top: 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      max-width: 500px;
+      text-align: left;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    select {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 200px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    select:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+
+    button {
+      margin-top: 2rem;
+      background: linear-gradient(90deg, #ff7e5f, #feb47b);
+      border: none;
+      border-radius: 25px;
+      padding: 0.9rem 2.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255,126,95,0.6);
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+      user-select: none;
+    }
+    button:hover {
+      box-shadow: 0 12px 30px rgba(255,126,95,0.9);
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+
+    audio {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 500px;
+      outline: none;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      background-color: rgba(255,255,255,0.15);
+      backdrop-filter: blur(5px);
+    }
+
+    @media (max-width: 600px) {
+      textarea, select, audio {
+        max-width: 100%;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>🎤 Text to Voice Converter with Accents</h2>
+
+  <textarea id="text" placeholder="Type your text here..."></textarea>
+
+  <label for="accent">Choose Accent:</label>
+  <select id="accent">
+    <option value="com">USA 🇺🇸</option>
+    <option value="co.uk">British 🇬🇧</option>
+    <option value="co.in">Indian 🇮🇳</option>
+    <option value="com.sa">Arabic 🇸🇦</option>
+  </select>
+
+  <button onclick="convertTextToSpeech()">Convert to Speech</button>
+
+  <audio id="audioPlayer" controls></audio>
+
+  <script>
+    async function convertTextToSpeech() {
+      const text = document.getElementById('text').value.trim();
+      const tld = document.getElementById('accent').value;
+
+      if (!text) {
+        alert("Please enter some text.");
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/tts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: text,
+            lang: 'en',
+            tld: tld
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to get audio");
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = audioUrl;
+        audioPlayer.play();
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>
