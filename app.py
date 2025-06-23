@@ -1,9 +1,10 @@
+import os
 from flask import Flask, request, send_file
-from gtts import gTTS
 from flask_cors import CORS
+from gtts import gTTS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Enable CORS
 
 @app.route('/')
 def home():
@@ -21,15 +22,6 @@ def tts():
     tts.save(filename)
     
     return send_file(filename, mimetype='audio/mpeg')
-
-if __name__ == '__main__':
-   import os
-from flask import Flask
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Server is running!"
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Use Render's PORT or default 5000
